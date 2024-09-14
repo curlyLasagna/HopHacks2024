@@ -74,10 +74,12 @@ const App = () => {
   };
 
   const handleSubmit = async () => {
-    if (inputValue.trim() && !requestInProgress) {
+    if (validateInput(inputValue.trim()) && !requestInProgress) {
       fetchImage(); // Call function to set barcode and trigger API fetch
       storeUserID(inputValue)
       console.log("this is user ID", await getUserID())
+    }else {
+      setError('Invalid input. Please enter exactly 8 digits.');
     }
   };
 
@@ -110,7 +112,7 @@ const App = () => {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={styles.prefixBarcode}>220552</Text> {/* Text before input field */}
+        <Text style={styles.prefixBarcode}>220552</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter barcode number"
