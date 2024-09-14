@@ -2,17 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, Text, TextInput, Button } from 'react-native';
 
 const App = () => {
-  const [barcode, setBarcode] = useState('123455678'); // Default barcode
+  const [barcode, setBarcode] = useState<string | null>(null); // Start with null to prevent initial fetch
   const [imageBase64, setImageBase64] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [inputValue, setInputValue] = useState('123455678'); // Initial value for input
+  const [loading, setLoading] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [requestInProgress, setRequestInProgress] = useState(false);
+
+  const fetchImage = () => {
+    if (!inputValue.trim()) {
+      // No need to fetch if the input is empty
+      return;
+    }
+
+    setBarcode(inputValue.trim()); // Set barcode state to trigger fetch
+  };
 
   useEffect(() => {
-    // Function to fetch image based on barcode
-    const fetchImage = () => {
+    if (barcode) {
+      // Function to fetch image based on barcode
+
       setLoading(true); // Set loading to true before fetching
+      setRequestInProgress(true); // Set requestInProgress to true
       fetch(`https://barcodeapi.org/api/128/${barcode}`, {
-        method: 'GET'
+        method: 'GET',
       })
         .then(response => {
           console.log('Response Status:', response.status);  // Log the response status
@@ -24,15 +36,15 @@ const App = () => {
           const imageStr = arrayBufferToBase64(buffer);  // Convert ArrayBuffer to base64 string
           setImageBase64(base64Flag + imageStr);         // Set image as base64 string
           setLoading(false);
+          setRequestInProgress(false);
         })
         .catch(error => {
           console.error('Error fetching image:', error);
           setLoading(false);
+          setRequestInProgress(false);
         });
-    };
-
-    fetchImage();
-  }, [barcode]); // Fetch image whenever the barcode changes
+    }
+  }, [barcode]); // Fetch image whenever the barcode changes, if it's not null
 
   // Function to convert ArrayBuffer to base64 string
   const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
@@ -50,7 +62,9 @@ const App = () => {
   };
 
   const handleSubmit = () => {
-    setBarcode(inputValue); // Update barcode state to trigger fetch
+    if (inputValue.trim() && !requestInProgress) {
+      fetchImage(); // Call function to set barcode and trigger API fetch
+    }
   };
 
   if (loading) {
@@ -73,7 +87,7 @@ const App = () => {
           style={styles.image}
         />
       ) : (
-        <Text>No Image Available</Text>   // Handle case when no image is available
+        inputValue ? <Text>No Image Available</Text> : <Text>Please enter a barcode number</Text>
       )}
     </View>
   );
