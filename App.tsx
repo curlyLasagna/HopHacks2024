@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, Text, TextInput, Button } from 'react-native';
 
@@ -72,14 +73,38 @@ const App = () => {
     setError(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (inputValue.trim() && !requestInProgress) {
       fetchImage(); // Call function to set barcode and trigger API fetch
+      storeUserID(inputValue)
+      console.log("this is user ID", await getUserID())
     }
   };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  const storeUserID = async (userID: string) => {
+    console.log(userID);
+    try {
+      await AsyncStorage.setItem('userID', userID);
+    } catch (error) {
+      console.log("Your phone sucks");
+    }
+  }
+
+  const getUserID = async () => {
+    let userID: string | null = "";
+    try {
+      userID = await AsyncStorage.getItem('userID');
+      if (userID) {
+        setBarcode(userID)
+      }
+    } catch (error) {
+      console.log("Your phone sucks");
+    }
+    return userID;
   }
 
   return (
