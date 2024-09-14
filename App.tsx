@@ -3,23 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, Text, TextInput, Button } from 'react-native';
 
 const App = () => {
-<<<<<<< HEAD
-  const [barcode, setBarcode] = useState('123455678'); // Default barcode
-
-  const storeID = async (onecard_val: string) => {
-    const [userEntered: Boolean, setUserEntered] = useState();
-
-    try {
-      await AsyncStorage.setItem('ID', onecard_val);
-    } catch (e) {
-      console.log("your phone sucks");
-    }
-  }
-||||||| c745af5
-  const [barcode, setBarcode] = useState('123455678'); // Default barcode
-=======
   const [barcode, setBarcode] = useState<string | null>(null); // Start with null to prevent initial fetch
->>>>>>> 19bd06acdba4012104588a914d465204da6762d9
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -78,14 +62,38 @@ const App = () => {
     setInputValue(text); // Update inputValue state
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (inputValue.trim() && !requestInProgress) {
       fetchImage(); // Call function to set barcode and trigger API fetch
+      storeUserID(inputValue)
+      console.log("this is user ID", await getUserID())
     }
   };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  const storeUserID = async (userID: string) => {
+    console.log(userID);
+    try {
+      await AsyncStorage.setItem('userID', userID);
+    } catch (error) {
+      console.log("Your phone sucks");
+    }
+  }
+
+  const getUserID = async () => {
+    let userID: string | null = "";
+    try {
+      userID = await AsyncStorage.getItem('userID');
+      if (userID) {
+        setBarcode(userID)
+      }
+    } catch (error) {
+      console.log("Your phone sucks");
+    }
+    return userID;
   }
 
   return (
