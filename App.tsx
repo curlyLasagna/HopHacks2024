@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, ActivityIndicator, Text, TextInput, Button } from 'react-native';
+import { View, Image, StyleSheet, ActivityIndicator, Text, TextInput, Button, } from 'react-native';
 
 const App = () => {
   const [barcode, setBarcode] = useState<string | null>(null); // Start with null to prevent initial fetch
@@ -108,9 +108,18 @@ const App = () => {
   }
 
   return (
+
+
     <View style={styles.container}>
+        <View style={styles.header}>
+        <Image
+          source={require('./assets/tu.png')}  // Replace with your image URL or local image
+          style={styles.headerImage}
+        />
+        
+      </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.prefixBarcode}>220552</Text> {/* Text before input field */}
+        <Text style={styles.prefixBarcode}>220552</Text> 
         <TextInput
           style={styles.input}
           placeholder="Enter barcode number"
@@ -119,7 +128,8 @@ const App = () => {
           keyboardType="numeric"
         />
       </View>
-      <Button title="Fetch Image" onPress={handleSubmit} />
+
+      <Button color={'#cc9900'} title="Fetch Image" onPress={handleSubmit} />
       {error && <Text style={styles.error}>{error}</Text>}
       {imageBase64 ? (
         <Image
@@ -170,6 +180,30 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 16,
   },
+  header: {
+    position: 'absolute',
+    
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 90,
+    backgroundColor: '#cc9900',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    zIndex: 1000,  // Ensure the header is above other content
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: '#FFFFFF',
+    
+  }, headerImage: {
+    marginTop: 10,
+    marginLeft: 10,
+    width: 150,
+    height: '45%',
+    marginRight: 10,
+  },
+ 
 });
 
 export default App;
