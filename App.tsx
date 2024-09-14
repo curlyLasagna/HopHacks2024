@@ -1,9 +1,20 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, Text } from 'react-native';
 
 const cors = require('cors');
 
 const App = () => {
+
+  const storeID = async (onecard_val: string) => {
+    const [userEntered: Boolean, setUserEntered] = useState();
+
+    try {
+      await AsyncStorage.setItem('ID', onecard_val);
+    } catch (e) {
+      console.log("your phone sucks");
+    }
+  }
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
