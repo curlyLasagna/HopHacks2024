@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, ActivityIndicator, Text, TextInput, Button, } from 'react-native';
 
 const App = () => {
-  const [barcode, setBarcode] = useState<string | null>(null); // Start with null to prevent initial fetch
+  // Start with null to prevent initial fetch
+  const [barcode, setBarcode] = useState<string | null>(null); 
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -34,7 +35,8 @@ const App = () => {
 
       setLoading(true); // Set loading to true before fetching
       setRequestInProgress(true); // Set requestInProgress to true
-      fetch(`https://barcodeapi.org/api/128/220552${barcode}`, {
+      // Prepend barcode with 220552
+      fetch(`https://barcodeapi.org/api/qr/220552${barcode}`, {
         method: 'GET',
       })
         .then(response => {
@@ -42,7 +44,6 @@ const App = () => {
           return response.arrayBuffer();
         })  // Get the binary data as an ArrayBuffer
         .then(buffer => {
-          console.log('Received buffer:', buffer.byteLength);
           const base64Flag = 'data:image/png;base64,';  // Use correct MIME type
           const imageStr = arrayBufferToBase64(buffer);  // Convert ArrayBuffer to base64 string
           setImageBase64(base64Flag + imageStr);         // Set image as base64 string
@@ -74,10 +75,12 @@ const App = () => {
   };
 
   const handleSubmit = async () => {
-    if (inputValue.trim() && !requestInProgress) {
+    if (validateInput(inputValue.trim()) && !requestInProgress) {
       fetchImage(); // Call function to set barcode and trigger API fetch
       storeUserID(inputValue)
       console.log("this is user ID", await getUserID())
+    }else {
+      setError('Invalid input. Please enter exactly 8 digits.');
     }
   };
 
@@ -119,7 +122,7 @@ const App = () => {
         
       </View>
       <View style={styles.inputContainer}>
-        <Text style={styles.prefixBarcode}>220552</Text> 
+        <Text style={styles.prefixBarcode}>"220552 - "</Text>
         <TextInput
           style={styles.input}
           placeholder="Enter barcode number"
@@ -136,9 +139,9 @@ const App = () => {
           source={{ uri: imageBase64 }}   // Use the base64 string as the image source
           style={styles.image}
         />
-      ) : (
-        inputValue && !error ? <Text>No Image Available</Text> : <Text>Please enter a barcode number</Text>
-
+      ) : (<Text>
+        {inputValue && !error ? "No Image Available" : "Please enter a barcode number"}
+      </Text>
       )}
     </View>
   );
@@ -153,7 +156,6 @@ const styles = StyleSheet.create({
   },
   prefixBarcode: {
     fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 16, // Space between text and input
   },
   input: {
@@ -172,7 +174,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8, // Add vertical padding inside the container
   },
   image: {
-    width: '45%',
+    width: '65%',
     height: '45%',
     resizeMode: 'contain',
   },
